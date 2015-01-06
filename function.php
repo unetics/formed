@@ -2,7 +2,7 @@
     /* 
     Plugin Name: Formed
     Description: Premium WordPress form builder. Make amazing forms, incredibly fast.
-    Version: 0.0.11
+    Version: 0.0.3
     GitHub Plugin URI: https://github.com/unetics/formed
 	GitHub Branch:     master
     */
