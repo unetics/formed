@@ -1,8 +1,10 @@
 <?php  
     /* 
     Plugin Name: Formed
-    Description: Premium WordPress form and survey builder. Make amazing forms, incredibly fast.
-    Version: 0.0.2
+    Description: Premium WordPress form builder. Make amazing forms, incredibly fast.
+    Version: 0.0.1
+    GitHub Plugin URI: https://github.com/unetics/formed
+	GitHub Branch:     master
     */
     if (!isset($_SESSION)) { session_start(); }
   

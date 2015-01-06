@@ -31,7 +31,7 @@
 							<td class='row_click'><?php echo $row->added; ?></td>
 							<td style='text-align: center; border-right: 1px solid #eee'>
 
-								<a class='delete-row btn-danger' data-loading='...' data-complete="<i class='formed-ok'></i>" data-reset="<i class='formed-trash'></i>" id='delete_<?php echo $row->id; ?>' title='Delete this form'><i class='formed-trash'></i>
+								<a class='delete-row btn-danger' data-loading='...' data-complete="<i class='formed-ok'></i>" data-reset="<i class='formed-trash'></i>" id='delete_<?php echo $row->id; ?>' title='Delete this form'><i class='formed-trash'>delete</i>
 								</a>
 
 							</td>

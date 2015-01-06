@@ -1490,33 +1490,14 @@ $scope.addEl = function (type) {
       break;
 
       case 'submit':
-      if($scope.build[inx].sub_th==undefined)
+      
+      if($scope.build[inx].style==undefined)
       {
-        $scope.build[inx].sub_th = 'boots';
+        $scope.build[inx].style = 'primary';
       }
-      if($scope.build[inx].sco==undefined)
+      if($scope.build[inx].align==undefined)
       {
-        $scope.build[inx].sco = '#ddd';
-      }
-      if($scope.build[inx].sfs==undefined)
-      {
-        $scope.build[inx].sfs = 15;
-      }
-      if($scope.build[inx].spad1==undefined)
-      {
-        $scope.build[inx].spad1 = '42px';
-      }
-      if($scope.build[inx].spad2==undefined)
-      {
-        $scope.build[inx].spad2 = '100px';
-      }
-      if($scope.build[inx].curve==undefined)
-      {
-        $scope.build[inx].curve = 4;
-      }
-      if($scope.build[inx].sbold==undefined)
-      {
-        $scope.build[inx].sbold = 'normal';
+        $scope.build[inx].align = 'right';
       }
       if($scope.build[inx].cap1==undefined)
       {
@@ -1566,7 +1547,6 @@ $scope.addEl = function (type) {
   {
     $scope.addEl('submit');
   }
-
   setTimeout("add_field_call()", 500);
 
 }
