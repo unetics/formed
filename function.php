@@ -1531,9 +1531,25 @@ function formed_menu()
     add_submenu_page( 'formed_admin', 'Formed - Inboxs',  $menu_label, 'edit_posts', 'formed_admin_inbox', 'formed_menu_inbox' ); 
 }
 
+function url_get_contents ($Url) {
+    if (!function_exists('curl_init')){ 
+        die('CURL is not installed!');
+    }
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, $Url);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    $output = curl_exec($ch);
+    curl_close($ch);
+    return $output;
+}
+
 function noWhite($name)
 { 
-    $file = file_get_contents(plugins_url('/formed/views/fields/'.$name.'.php'));
+	if( ini_get('allow_url_fopen') ) {   // lucky me my server allows file_get_contents ...
+		$file = file_get_contents(plugins_url('/formed/views/fields/'.$name.'.php'));
+	}else{
+		$file = url_get_contents(plugins_url('/formed/views/fields/'.$name.'.php'));
+	} 
 	$processed = preg_replace('/\s\s+/', ' ', $file);
 	return $processed;
 }
