@@ -2,18 +2,22 @@
     /* 
     Plugin Name: Formed
     Description: Premium WordPress form builder. Make amazing forms, incredibly fast.
-    Version: 1.0.1
+    Version: 1.0.2
     GitHub Plugin URI: https://github.com/unetics/formed
 	GitHub Branch:     master
     */
     if (!isset($_SESSION)) { session_start(); }
-  
-    global $wpdb, $table_builder, $table_subs, $table_stats, $table_info, $is_multi, $fc_version;
+	
+	$plugin_data = get_plugin_data( __FILE__ );
+  	$plugin_version = $plugin_data['Version'];
+    
+    global $wpdb, $table_builder, $table_subs, $table_stats, $table_info, $is_multi, $fc_version, $formed_version;
     $table_builder = $wpdb->prefix . "formed_builder";
     $table_subs = $wpdb->prefix . "formed_submissions";
     $table_stats = $wpdb->prefix . "formed_stats";
     $table_info = $wpdb->prefix . "formed_info";
     $fc_version = 2.2;
+    $formed_version = $plugin_version;
 
     $restricted = array('999999','1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','16','17','18','19','20','21','22','23');
 
@@ -1598,7 +1602,7 @@ function formed_admin_assets($hook)
                 $rec = stripcslashes($row->recipients);
             }
 
-            wp_enqueue_style( 'formed_forms_css', plugins_url( 'css/editor_form.css', __FILE__ ));
+            wp_enqueue_style( 'formed_forms_css', plugins_url( 'css/editor_form.css', __FILE__ ), array(), $formed_version);
             wp_enqueue_script('media-upload');
             wp_enqueue_script('thickbox');
             wp_enqueue_script('my-upload');
