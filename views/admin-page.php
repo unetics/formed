@@ -49,7 +49,7 @@ $mysubr = $wpdb->get_results( "SELECT * FROM $table_subs WHERE seen='1'", 'ARRAY
 	<div class="tab-content">
 		<?php
 		include_once('inc/forms_tab.php');
-		include_once('inc/files_tab.php');
+// 		include_once('inc/files_tab.php');
 		?>
 	</div>
 </div><!-- End of Cover -->

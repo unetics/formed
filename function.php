@@ -2,14 +2,21 @@
     /* 
     Plugin Name: Formed
     Description: Premium WordPress form builder. Make amazing forms, incredibly fast.
-    Version: 1.0.2
+    Version: 1.0.3
     GitHub Plugin URI: https://github.com/unetics/formed
 	GitHub Branch:     master
     */
     if (!isset($_SESSION)) { session_start(); }
 	
-	$plugin_data = get_plugin_data( __FILE__ );
-  	$plugin_version = $plugin_data['Version'];
+	
+	function get_version() {
+	/* Set plugin version data for use elsewhere in the plugin */
+	if ( function_exists( 'get_plugin_data' ) ) {
+		$plugin_data = get_plugin_data( __FILE__ );
+		$plugin_version = $plugin_data['Version'];
+		}
+	}
+	add_action( 'admin_init', 'get_version' ); 
     
     global $wpdb, $table_builder, $table_subs, $table_stats, $table_info, $is_multi, $fc_version, $formed_version;
     $table_builder = $wpdb->prefix . "formed_builder";
@@ -1602,7 +1609,7 @@ function formed_admin_assets($hook)
                 $rec = stripcslashes($row->recipients);
             }
 
-            wp_enqueue_style( 'formed_forms_css', plugins_url( 'css/editor_form.css', __FILE__ ), array(), $formed_version);
+            wp_enqueue_style( 'formed_forms_css', plugins_url( 'css/editor_form.css', __FILE__ ), array(),$formed_version);
             wp_enqueue_script('media-upload');
             wp_enqueue_script('thickbox');
             wp_enqueue_script('my-upload');
