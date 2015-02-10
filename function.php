@@ -1,11 +1,14 @@
 <?php  
-    /* 
-    Plugin Name: Formed
-    Description: Premium WordPress form builder. Make amazing forms, incredibly fast.
-    Version: 1.0.3
-    GitHub Plugin URI: https://github.com/unetics/formed
-	GitHub Branch:     master
-    */
+/* 
+Plugin Name:		Formed
+Description:		Premium WordPress form builder. Make amazing forms, incredibly fast.
+Version: 			1.0.3
+Text Domain:		formed
+GitHub Plugin URI:	https://github.com/unetics/formed
+GitHub Branch:		master
+Requires WP:		3.8
+Requires PHP:		5.3
+*/
     if (!isset($_SESSION)) { session_start(); }
 	
 	
