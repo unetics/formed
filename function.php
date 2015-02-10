@@ -2,7 +2,7 @@
 /* 
 Plugin Name:		Formed
 Description:		Premium WordPress form builder. Make amazing forms, incredibly fast.
-Version: 			1.0.4
+Version: 			1.0.5
 Text Domain:		formed
 GitHub Plugin URI:	unetics/formed
 GitHub Branch:		master
@@ -1536,7 +1536,7 @@ function formed_menu()
 {
 	global $wpdb;
 	$table_subs = $wpdb->prefix . "formed_submissions";
-	$wpdb->get_results( "SELECT * FROM wp_formed_submissions WHERE seen <> '1'" );
+	$wpdb->get_results( "SELECT * FROM $table_subs WHERE seen <> '1'" );
 	$unread =($wpdb->num_rows);
 	
     $page = add_menu_page( 'Formed - Form Builder', 'Forms', 'edit_dashboard', 'formed_admin', 'formed_menu_options', 'dashicons-feedback','31.21' );   
