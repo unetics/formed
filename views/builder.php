@@ -132,7 +132,7 @@ $conf = json_decode($con);
 							<input type='hidden' class='getlocation' val='' name='location_hidden__0_0_1000_'>
 							<a id='<?php echo $rand2; ?>_anchor'></a>
 							<a href='#<?php echo $rand2; ?>_anchor' class='anchor_trigger'></a>
-							<ul class='form_ul {{con[0].theme}}' id='form_ul'><li ng-repeat="el in build" id='fe_{{$index}}_<?php echo $form_id; ?>' class='nform_li' ng-class='[el.default, "fe_"+$index, "required-"+el.req]' scale><div compile="el.el_f" ng-style='{marginBottom: el.divspa, marginTop: el.divspa}'></div><span class='element_id'>{{$index}}</span></ul><div id='fe_submit' class='form_submit'><div class='res_div'><span class='nform_res'></span></div><span style='text-align: center; display: inline; padding-top: 8px; padding-bottom: 4px'><!--START--><!--END--></span></div><input type='text' name='name' id='waspnet' value=''></form>
+							<ul class='form_ul {{con[0].theme}}' id='form_ul'><li ng-repeat="el in build" id='fe_{{$index}}_<?php echo $form_id; ?>' class='nform_li' ng-class='[el.default, "fe_"+$index, "required-"+el.req]' scale><div class="clearfix" compile="el.el_f" ng-style='{marginBottom: el.divspa, marginTop: el.divspa}'></div><span class='element_id'>{{$index}}</span></ul><div id='fe_submit' class='form_submit'><div class='res_div'><span class='nform_res'></span></div><span style='text-align: center; display: inline; padding-top: 8px; padding-bottom: 4px'><!--START--><!--END--></span></div><input type='text' name='name' id='waspnet' value=''></form>
 						</div>
 					</div><!-- End of Right Part -->
 				</td>
