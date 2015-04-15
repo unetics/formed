@@ -2,7 +2,7 @@
 /* 
 Plugin Name:		Formed
 Description:		Premium WordPress form builder. Make amazing forms, incredibly fast.
-Version: 			1.0.7
+Version: 			1.0.8
 Text Domain:		formed
 GitHub Plugin URI:	unetics/formed
 GitHub Branch:		master
@@ -1423,8 +1423,6 @@ register_activation_hook( __FILE__, 'formed_activate' );
 function formeds_register_scripts()
 {
     global $fc_version;
-    wp_enqueue_script('jquery');
-
     wp_enqueue_script('fc_combined_js', plugins_url( 'js/combined-js.js', __FILE__ ) ,array(),$fc_version);
 
     wp_enqueue_script('formedjs', plugins_url( 'js/form.js?v=2', __FILE__ ), array('jquery','jquery-ui-core','jquery-ui-mouse', 'jquery-ui-widget', 'jquery-ui-sortable', 'jquery-ui-slider'),$fc_version);
@@ -1563,9 +1561,7 @@ function formed_admin_assets($hook)
     if ( $hook == $hook/* 'toplevel_page_formed_admin' */ )
     {
 
-        /* Common Assets */
-        /* Mother */
-        wp_enqueue_script('jquery');    
+        /* Common Assets */  
         /* Libraries and Extensions */
         wp_enqueue_script('jquery-ui-core' );
         wp_enqueue_script('jquery-ui-widget' );
