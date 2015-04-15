@@ -2,7 +2,7 @@
 /* 
 Plugin Name:		Formed
 Description:		Premium WordPress form builder. Make amazing forms, incredibly fast.
-Version: 			1.0.6
+Version: 			1.0.7
 Text Domain:		formed
 GitHub Plugin URI:	unetics/formed
 GitHub Branch:		master
@@ -10,24 +10,13 @@ Requires WP:		3.8
 Requires PHP:		5.3
 */
     if (!isset($_SESSION)) { session_start(); }
-	
-	
-	function get_version() {
-	/* Set plugin version data for use elsewhere in the plugin */
-	if ( function_exists( 'get_plugin_data' ) ) {
-		$plugin_data = get_plugin_data( __FILE__ );
-		$plugin_version = $plugin_data['Version'];
-		}
-	}
-	add_action( 'admin_init', 'get_version' ); 
-    
+	   
     global $wpdb, $table_builder, $table_subs, $table_stats, $table_info, $is_multi, $fc_version, $formed_version;
     $table_builder = $wpdb->prefix . "formed_builder";
     $table_subs = $wpdb->prefix . "formed_submissions";
     $table_stats = $wpdb->prefix . "formed_stats";
     $table_info = $wpdb->prefix . "formed_info";
     $fc_version = 2.2;
-    $formed_version = $plugin_version;
 
     $restricted = array('999999','1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','16','17','18','19','20','21','22','23');
 
@@ -57,8 +46,6 @@ Requires PHP:		5.3
     add_action('wp_ajax_nopriv_formed_increment2', 'formed_increment2');
     add_action('wp_ajax_formed_test_email', 'formed_test_email');
     add_action('wp_ajax_nopriv_formed_test_email', 'formed_test_email');
-    add_action('wp_ajax_formed_verifyLicense', 'formed_verifyLicense');
-    add_action('wp_ajax_nopriv_formed_verifyLicense', 'formed_verifyLicense');
 
 function formed_parse_emails($string, $nos = 100)
 {
@@ -1541,6 +1528,7 @@ function formed_menu()
 	
     $page = add_menu_page( 'Formed - Form Builder', 'Forms', 'edit_dashboard', 'formed_admin', 'formed_menu_options', 'dashicons-feedback','31.21' );   
     $alert_title = esc_attr( sprintf( '%d plugin warnings', $unread ) );
+    $alert_count = '';
     $menu_label = sprintf( __( 'Inbox %s' ), "<span class='update-plugins count-$alert_count' title='$alert_title'><span class='update-count'>$unread</span></span>" );
     add_submenu_page( 'formed_admin', 'Formed - Inboxs',  $menu_label, 'edit_posts', 'formed_admin_inbox', 'formed_menu_inbox' ); 
 }
