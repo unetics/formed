@@ -11,7 +11,6 @@ class formed_Widget extends WP_Widget
   {
   	global $wpdb;
     $instance = wp_parse_args((array) $instance, array( 'id' => '', ));
-    $text = stripslashes($instance['text']);
     $table_builder = $wpdb->prefix . "formed_builder";
 	$myforms = $wpdb->get_results( "SELECT id,name,description FROM $table_builder ORDER BY id" );	
     global $wpdb, $table_subs, $table_builder;

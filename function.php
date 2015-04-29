@@ -2,13 +2,14 @@
 /* 
 Plugin Name:		Formed
 Description:		Premium WordPress form builder. Make amazing forms, incredibly fast.
-Version: 			1.0.8
+Version: 			1.0.9
 Text Domain:		formed
 GitHub Plugin URI:	unetics/formed
 GitHub Branch:		master
 Requires WP:		3.8
 Requires PHP:		5.3
 */
+
     if (!isset($_SESSION)) { session_start(); }
 	   
     global $wpdb, $table_builder, $table_subs, $table_stats, $table_info, $is_multi, $fc_version, $formed_version;
@@ -1478,11 +1479,6 @@ function add_formed( $atts, $content = null )
 
     foreach ($myrows as $row)
     {
-        $config = json_decode(stripslashes($row->con), true);
-        $css = $config[0]['custom_css'];
-    }
-    foreach ($myrows as $row)
-    {
         $form_html = stripslashes($row->html);
     }
     if ($form_html=='')
@@ -1491,10 +1487,6 @@ function add_formed( $atts, $content = null )
     }
 
     $defaultFonts = array('A','', 'Helvetica Neue, Arial', 'Helvetica, Arial', 'Courier New', 'Georgia', 'Book Antiqua, Palatino Linotype', 'Geneva, Tahoma', 'Times New Roman', 'Trebuchet MS');
-    if (array_search($config[0]['formfamily'], $defaultFonts)==false)
-    {
-        $finalHTML .= "<script>window.GoogleFont = '".$config[0]['formfamily']."';</script>";
-    }
 
     $form_html = formed_replace_comments("<!--STARTID-->", "<!--ENDID-->", $form_html, $un);
     $form_html = formed_replace_comments("STARTID", "ENDID", $form_html, $un);
@@ -1562,12 +1554,14 @@ function formed_admin_assets($hook)
     {
 
         /* Common Assets */  
-        /* Libraries and Extensions */
+        /* Libraries and Extensions *//*
+
         wp_enqueue_script('jquery-ui-core' );
         wp_enqueue_script('jquery-ui-widget' );
         wp_enqueue_script('jquery-ui-draggable' );
         wp_enqueue_script('jquery-ui-sortable' );
         wp_enqueue_script('jquery-ui-slider' );
+*/
         wp_enqueue_script('bs-modal-js', plugins_url( 'js/fcmodal.js', __FILE__ ));
         wp_enqueue_script('datepicker-js', plugins_url( 'libraries/datepicker/js/bootstrap-datepicker.js', __FILE__ ));
         wp_enqueue_script( 'upload-1', plugins_url( 'libraries/upload/jquery.fileupload.min.js', __FILE__ ), array('jquery-ui-widget'));
@@ -1596,7 +1590,7 @@ function formed_admin_assets($hook)
                 $rec = stripcslashes($row->recipients);
             }
 
-            wp_enqueue_style( 'formed_forms_css', plugins_url( 'css/editor_form.css', __FILE__ ), array(),$formed_version);
+            wp_enqueue_style( 'formed_forms_css', plugins_url( 'css/editor_form.css', __FILE__ ), array());
             wp_enqueue_script('media-upload');
             wp_enqueue_script('thickbox');
             wp_enqueue_script('my-upload');
