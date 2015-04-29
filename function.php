@@ -2,7 +2,7 @@
 /* 
 Plugin Name:		Formed
 Description:		Premium WordPress form builder. Make amazing forms, incredibly fast.
-Version: 			1.1.0
+Version: 			1.1.1
 Text Domain:		formed
 GitHub Plugin URI:	unetics/formed
 GitHub Branch:		master
@@ -132,7 +132,7 @@ function formed_page()
                 {
                     $mess[$key] .= "<hr>$value[value]<hr>";
                 }
-                else if ($value['type']=='hidden' && $value['label']=='location') 
+                else if ($value['type'] == 'hidden' && $value['label']=='location') 
                 {
                     $location = $value['value'];
                     $location_url = $value['value'];
@@ -1424,8 +1424,6 @@ register_activation_hook( __FILE__, 'formed_activate' );
 function formeds_register_scripts()
 {
     global $fc_version;
-    wp_enqueue_script('fc_combined_js', plugins_url( 'js/combined-js.js', __FILE__ ) ,array(),$fc_version);
-
     wp_enqueue_script('formedjs', plugins_url( 'js/form.js?v=2', __FILE__ ), array('jquery','jquery-ui-core','jquery-ui-mouse', 'jquery-ui-widget', 'jquery-ui-sortable', 'jquery-ui-slider'),$fc_version);
     wp_localize_script('formedjs', 'formedJS', array( 'ajaxurl' => admin_url( 'admin-ajax.php' ), 'server' => plugins_url('/formed/file-upload/server/content/upload.php'), 'locale' => plugins_url('/formed/libraries/datepicker/js/locales/'), 'other' => plugins_url('/formed') ) );
     wp_enqueue_script('formedjs2', plugins_url( 'js/form_only.js', __FILE__ ),array(),$fc_version);

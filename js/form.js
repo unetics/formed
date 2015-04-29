@@ -1540,10 +1540,6 @@ function checkInput(type)
 function update_date()
 {
 
-  jQuery('.timepicker').timepicker({
-    minuteStep: 5
-  });
-
   jQuery('.timepicker').focus(function(){
     jQuery(this).timepicker('showWidget');
   });
