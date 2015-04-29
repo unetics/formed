@@ -336,7 +336,7 @@
 
 							?>
 
-										<form id='export_form_form' name="myForm" action="<?php echo plugins_url('formed/php/export_form.php?id=').$_GET[id]; ?>" method="POST" target='_blank' style='width: 100%; margin: 0px; padding: 0px; display: inline-block'>
+										<form id='export_form_form' name="myForm" action="<?php echo plugins_url('formed/php/export_form.php?id=').$_GET['id']; ?>" method="POST" target='_blank' style='width: 100%; margin: 0px; padding: 0px; display: inline-block'>
 
 											<input type="hidden" id="export_build" name="build" value = "">
 											<input type="hidden" id="export_option" name="options" value = "">
@@ -345,7 +345,7 @@
 											<input type="hidden" id="export_dir" name="dir" value = "<?php echo plugins_url(); ?>">
 											<input type="hidden" id="export_dir2" name="dir2" value = "<?php echo site_url(); ?>">
 
-											<a id='export_form' export-link='<?php echo plugins_url('formed/php/export_form.php?id=').$_GET[id]; ?>' class='trans_btn' style='color: green; width: 100%' ng-click='export_form()'>
+											<a id='export_form' export-link='<?php echo plugins_url('formed/php/export_form.php?id=').$_GET['id']; ?>' class='trans_btn' style='color: green; width: 100%' ng-click='export_form()'>
 												Export Form
 											</a>
 

@@ -2,7 +2,7 @@
 /* 
 Plugin Name:		Formed
 Description:		Premium WordPress form builder. Make amazing forms, incredibly fast.
-Version: 			1.0.9
+Version: 			1.1.0
 Text Domain:		formed
 GitHub Plugin URI:	unetics/formed
 GitHub Branch:		master
@@ -1552,16 +1552,13 @@ function formed_admin_assets($hook)
     global $fc_version;
     if ( $hook == $hook/* 'toplevel_page_formed_admin' */ )
     {
-
-        /* Common Assets */  
-        /* Libraries and Extensions *//*
-
+        /* Libraries and Extensions */
         wp_enqueue_script('jquery-ui-core' );
         wp_enqueue_script('jquery-ui-widget' );
         wp_enqueue_script('jquery-ui-draggable' );
         wp_enqueue_script('jquery-ui-sortable' );
         wp_enqueue_script('jquery-ui-slider' );
-*/
+
         wp_enqueue_script('bs-modal-js', plugins_url( 'js/fcmodal.js', __FILE__ ));
         wp_enqueue_script('datepicker-js', plugins_url( 'libraries/datepicker/js/bootstrap-datepicker.js', __FILE__ ));
         wp_enqueue_script( 'upload-1', plugins_url( 'libraries/upload/jquery.fileupload.min.js', __FILE__ ), array('jquery-ui-widget'));
@@ -1643,8 +1640,7 @@ function formed_admin_assets($hook)
                         					'ide' => $id,  
                         					'countries' => plugins_url('/formed/data/countries.json'),  
                         					'states' => plugins_url('/formed/data/states.json'),  
-                        					'languages' => plugins_url('/formed/data/languages.json'),
-                        					'my' => $filey                       					
+                        					'languages' => plugins_url('/formed/data/languages.json')			
                         					  ) );
                         					  
              wp_localize_script( 'editor-js', 'inp', array( 
