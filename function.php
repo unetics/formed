@@ -2,7 +2,7 @@
 /* 
 Plugin Name:		Formed
 Description:		Premium WordPress form builder. Make amazing forms, incredibly fast.
-Version: 			1.1.1
+Version: 			1.1.2
 Text Domain:		formed
 GitHub Plugin URI:	unetics/formed
 GitHub Branch:		master
@@ -1559,10 +1559,9 @@ function formed_admin_assets($hook)
 
         wp_enqueue_script('bs-modal-js', plugins_url( 'js/fcmodal.js', __FILE__ ));
         wp_enqueue_script('datepicker-js', plugins_url( 'libraries/datepicker/js/bootstrap-datepicker.js', __FILE__ ));
-        wp_enqueue_script( 'upload-1', plugins_url( 'libraries/upload/jquery.fileupload.min.js', __FILE__ ), array('jquery-ui-widget'));
-        wp_enqueue_script( 'upload-2', plugins_url( 'libraries/upload/jquery.iframe-transport.min.js', __FILE__ ), array('jquery-ui-widget'));
+
         wp_enqueue_script('jquery-ui-widget');
-//         wp_enqueue_style( 'fc-fontello', plugins_url( 'css/fontello/css/formed.css', __FILE__ ));
+        wp_enqueue_style( 'fc-fontello', plugins_url( 'css/fontello/css/formed.css', __FILE__ ));
         wp_enqueue_script('time_js', plugins_url( 'libraries/timepicker/js/timepicker.min.js', __FILE__ )); 
         wp_enqueue_script( 'jquery-colorpicker-s', plugins_url( 'libraries/colorpicker/spectrum.js', __FILE__ ));        
         wp_enqueue_style( 'colorpicker_css', plugins_url( 'libraries/colorpicker/spectrum.css', __FILE__ ));        
@@ -1662,12 +1661,6 @@ function formed_admin_assets($hook)
 
             wp_enqueue_script( 'formed-build-js', plugins_url( 'js/build.js', __FILE__ ),array(),$fc_version);
             wp_localize_script( 'formed-build-js', 'MyAjax', array( 'ajaxurl' => admin_url( 'admin-ajax.php' ) ) );
-
-        }
-        else
-        {
-            wp_enqueue_script('datatables', plugins_url( 'libraries/datatables.js', __FILE__ ));
-            wp_deregister_script('jquery-ui-datepicker');
 
             /* Our Own Stuff */
             wp_enqueue_script('form-index-js', plugins_url( 'js/form-index.js', __FILE__ ),array(),$fc_version);
