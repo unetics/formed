@@ -49,7 +49,6 @@ $mysubr = $wpdb->get_results( "SELECT * FROM $table_subs WHERE seen='1'", 'ARRAY
 
 	<div class="tab-content">
 		<?php
-// 		include_once('inc/home_tab.php');
 		include_once('inc/submissions_tab.php');
 		?>
 	</div>

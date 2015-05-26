@@ -55,8 +55,20 @@
 					<th width="10%" title='Click to sort'>Options</th>
 				</tr>
 			</thead>
-			<tbody>
-
+			<tbody>				
+				<?php
+					foreach ($mysub as $sub) {
+						echo('<tr>');
+					echo('<td>'.$sub['id'].'</td>');
+					echo('<td>'.$sub['seen'].'</td>');
+					echo('<td>'.$sub['added'].'</td>');
+					echo('<td>'.$sub['form_id'].'</td>');
+					echo('<td>'.$sub['content'].'</td>');
+					echo('<td>delete</td>');
+					echo('</tr>');
+					
+					}
+					?>
 			</tbody>
 		</table>
 	</div>

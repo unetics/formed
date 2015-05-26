@@ -59,129 +59,6 @@ function show_submissions(page,search)
 }
 
 
-
-/*
-function drawChart(id, from, to)
-{
-  jQuery('#chart-cover').addClass('loading')
-  if (id)
-  {
-    var jsonData = jQuery.ajax({
-      url: ajaxurl,
-      dataType: "json",
-      type: "POST",
-      data: 'id='+id+'&action=formed_chart&from='+from+'&to='+to,
-      async: false
-    }).responseText;
-
-  }
-  else
-  {
-    var jsonData = jQuery.ajax({
-      url: ajaxurl,
-      dataType: "json",
-      data: 'action=formed_chart&from='+from+'&to='+to,
-      async: false
-    }).responseText;
-  }
-
-  var jsonData = jQuery.parseJSON( jsonData );
-
-  var totalViews = 0;
-  for (values in jsonData.views)
-  {
-    totalViews = totalViews + parseInt(jsonData.views[values][1]);
-  }
-  var totalSubmissions = 0;
-  for (values in jsonData.submissions)
-  {
-    totalSubmissions = totalSubmissions + parseInt(jsonData.submissions[values][1]);
-  }
-
-  jQuery({someValue: parseInt(jQuery('#tvs').text())}).animate({someValue: totalViews}, {
-    duration: 900,
-    easing:'swing',
-    step: function() {
-      jQuery('#tvs').text(Math.ceil(this.someValue));
-    }
-  });
-  jQuery({someValue: parseInt(jQuery('#tss').text())}).animate({someValue: totalSubmissions}, {
-    duration: 900,
-    easing:'swing',
-    step: function() {
-      jQuery('#tss').text(Math.ceil(this.someValue));
-    }
-  });
-  jQuery({someValue: parseInt(jQuery('#tcs').text())}).animate({someValue: (Math.round((totalSubmissions/totalViews)*10000)/100)}, {
-    duration: 900,
-    easing:'swing',
-    step: function() {
-      jQuery('#tcs').text(Math.ceil(this.someValue)+'%');
-    }
-  });
-  setTimeout(function(){
-    jQuery('#tvs').text(totalViews);
-    jQuery('#tss').text(totalSubmissions);
-    jQuery('#tcs').text((Math.round((totalSubmissions/totalViews)*10000)/100)+'%');
-  }, 1000);    
-
-  var plot = jQuery.plot("#chart-inner", [{
-    data: jsonData.views,
-    label: 'views',
-    color: 'rgb(255, 175, 80)',
-    bars: {show:true, align: 'center'}
-  },{
-    data: jsonData.submissions,
-    label: 'submissions',
-    color: 'rgb(28, 160, 28)',
-    lines: {show:true}
-  }], {
-    series: {
-      points: { show:true }
-    },
-    grid: {
-      hoverable: true,
-      clickable: true
-    },
-    xaxis: {
-      mode: "categories"
-    }
-  });
-  jQuery('#chart-cover').removeClass('loading')  
-
-  jQuery("#chart-inner").bind("plothover", function (event, pos, item) {
-
-    if (item) {
-      if (previousPoint != item.dataIndex) {
-
-        previousPoint = item.dataIndex;
-
-        jQuery("#tooltip").remove();
-        var x = Object.keys(item.series.xaxis.categories)[item.datapoint[0]],
-        y = item.datapoint[1];
-
-        showTooltip(item.pageX, item.pageY,
-         y + ' ' + item.series.label + " on " + x);
-      }
-    } else {
-      jQuery("#tooltip").remove();
-      previousPoint = null;            
-    }
-  });
-
-
-  jQuery("#chart-inner").bind("plotclick", function (event, pos, item) {
-    if (item) {
-      jQuery("#clickdata").text(" - click point " + item.dataIndex + " in " + item.series.label);
-      plot.highlight(item.series, item.datapoint);
-    }
-  });
-
-}
-*/
-
-
-
 function setupLabel()
 {
   if (jQuery('.label_check input').length) {
@@ -206,6 +83,7 @@ function setupLabel()
 
 
 
+/*
 jQuery(function () {
 
   jQuery('#import').fileupload({
@@ -252,6 +130,7 @@ jQuery(function () {
   });  
 
 });
+*/
 
 
 
@@ -327,6 +206,7 @@ jQuery(document).ready(function () {
 
   });
 
+/*
   // Set up DataTable
   if (jQuery('#subs').length)
   {
@@ -337,6 +217,7 @@ jQuery(document).ready(function () {
       "sPaginationType": "full_numbers"
     });
   }
+*/
 
 
 

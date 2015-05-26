@@ -2,7 +2,7 @@
 /* 
 Plugin Name:		Formed
 Description:		Premium WordPress form builder. Make amazing forms, incredibly fast.
-Version: 			1.1.2
+Version: 			1.1.3
 Text Domain:		formed
 GitHub Plugin URI:	unetics/formed
 GitHub Branch:		master
@@ -39,8 +39,6 @@ Requires PHP:		5.3
     add_action('wp_ajax_nopriv_formed_name_update', 'formed_name_update');
     add_action('wp_ajax_formed_delete_file', 'formed_delete_file');
     add_action('wp_ajax_nopriv_formed_delete_file', 'formed_delete_file');
-    add_action('wp_ajax_formed_chart', 'formed_chart');
-    add_action('wp_ajax_nopriv_formed_chart', 'formed_chart');
     add_action('wp_ajax_formed_increment', 'formed_increment');
     add_action('wp_ajax_nopriv_formed_increment', 'formed_increment');
     add_action('wp_ajax_formed_increment2', 'formed_increment2');
@@ -278,77 +276,6 @@ function formed_increment($id)
         $temp2 = $wpdb->insert( $table_info, array( 'time' => $date2, 'views' => 1, 'submissions' => 0, 'id' => $id ) );
     }
 
-}
-
-function formed_chart()
-{
-    error_reporting(0);
-    global $wpdb, $table_subs, $table_builder, $table_stats, $table_info;
-    $_POST['id'] = addslashes($_POST['id']);
-
-    $to = isset($_POST['to']) && !empty($_POST['to']) ? addslashes($_POST['to']) : date('Y/m/d', strtotime('now'));
-    $from = isset($_POST['from']) && !empty($_POST['from']) ? addslashes($_POST['from']) : date('Y/m/d', strtotime('-30 days', strtotime($to)));
-    
-    $diff = strtotime($to) - strtotime($from);
-    $diff = floor($diff/(60*60*24));
-
-    $from = $diff > 90 ? date('Y/m/d', strtotime('-90 days', strtotime($to))) : $from;
-    $from = $diff < 1 ? date('Y/m/d', strtotime('-1 days', strtotime($to))) : $from;
-
-    $diff = $diff > 90 ? 90 : $diff;
-    $diff = $diff < 1 ? 1 : $diff;
-
-    if (ctype_digit($_POST['id']))
-    {
-        $subs = $wpdb->get_results( "SELECT * FROM $table_info WHERE id = $_POST[id] ORDER BY time", "ARRAY_A" );
-    }
-    else
-    {
-        $subs = $wpdb->get_results( "SELECT * FROM $table_info ORDER BY time", "ARRAY_A" );
-    }
-
-    foreach ($subs as $key => $value) 
-    {
-        if ($subs[$key]['time']==$subs[$key+1]['time'])
-        {
-            $subs[$key+1]['views'] = $subs[$key+1]['views']+$subs[$key]['views'];
-            $subs[$key+1]['submissions'] = $subs[$key+1]['submissions']+$subs[$key]['submissions'];
-            unset($subs[$key]);
-        }
-    }
-
-    foreach ($subs as $key => $value)
-    {
-        $result[$value['time']] = array('views'=>$value['views'],'submissions'=>$value['submissions']);
-    }
-
-    $i = 0;
-    $final = array();
-    while ($i<=$diff)
-    {
-        $dateTemp0 = date("Y-m-d", strtotime('+'.$i.'day', strtotime($from)));
-        $dateTemp1 = date("d M", strtotime('+'.$i.'day', strtotime($from)));
-        $final[] = isset($result[$dateTemp0]) ? array('time'=>$dateTemp1,'views'=>$result[$dateTemp0]['views'],'submissions'=>$result[$dateTemp0]['submissions']) : array('time'=>$dateTemp1,'views'=>0,'submissions'=>0);
-        $i++;
-    }
-
-    foreach ($final as $key => $value)
-    {
-        $dt = date_parse($final[$key]['time']);
-        $diff_m = abs(($dt['month']-date('m'))*30);
-        $diff_d = date('d')-$dt['day'];
-        $month = date('Y-m-d');
-        $diff = $diff_m+$diff_d;
-        $final[$key]['time'] = date("d M", strtotime($final[$key]['time']));
-        $views[] = array($final[$key]['time'], $final[$key]['views']);
-        $submissions[] = array($final[$key]['time'], $final[$key]['submissions']);
-    }
-
-    $data['views'] = $views;
-    $data['submissions'] = $submissions;
-
-    echo json_encode($data);
-    die();
 }
 
 function formed_delete_file()
@@ -1514,11 +1441,15 @@ function formed_menu()
 	$wpdb->get_results( "SELECT * FROM $table_subs WHERE seen <> '1'" );
 	$unread =($wpdb->num_rows);
 	
-    $page = add_menu_page( 'Formed - Form Builder', 'Forms', 'edit_dashboard', 'formed_admin', 'formed_menu_options', 'dashicons-feedback','31.21' );   
+	$topmenu_label = 'Forms ';
+	
+    $page = add_menu_page( 'Formed - Form Builder', $topmenu_label, 'edit_dashboard', 'formed_admin', 'formed_menu_options', 'dashicons-feedback','31.21' );   
     $alert_title = esc_attr( sprintf( '%d plugin warnings', $unread ) );
     $alert_count = '';
     $menu_label = sprintf( __( 'Inbox %s' ), "<span class='update-plugins count-$alert_count' title='$alert_title'><span class='update-count'>$unread</span></span>" );
-    add_submenu_page( 'formed_admin', 'Formed - Inboxs',  $menu_label, 'edit_posts', 'formed_admin_inbox', 'formed_menu_inbox' ); 
+    add_submenu_page( 'formed_admin', 'Formed - Inboxs',  $menu_label, 'edit_posts', 'formed_admin_inbox', 'formed_menu_inbox' );
+  
+     
 }
 
 function url_get_contents ($Url) {
@@ -1544,12 +1475,11 @@ function noWhite($name)
 	return $processed;
 }
 
-add_action( 'admin_enqueue_scripts', 'formed_admin_assets' ); 
+add_action( 'admin_init', 'formed_admin_assets' ); 
 function formed_admin_assets($hook)
 {
     global $fc_version;
-    if ( $hook == $hook/* 'toplevel_page_formed_admin' */ )
-    {
+
         /* Libraries and Extensions */
         wp_enqueue_script('jquery-ui-core' );
         wp_enqueue_script('jquery-ui-widget' );
@@ -1568,13 +1498,9 @@ function formed_admin_assets($hook)
         /* Custom Work */
         wp_enqueue_style('fc-admin-style', plugins_url( 'css/admin-style.css', __FILE__ ),array(),$fc_version);  
         wp_enqueue_style('fc-common-style', plugins_url( 'css/common.css', __FILE__ ),array(),$fc_version);
-
-
-        if ( isset($_GET['id']) )
-        {
-
+ 
             global $wpdb, $table_builder;
-            $id = addslashes($_GET['id']);
+            $id = addslashes($_GET["id"]);
             $qry = $wpdb->get_results( "SELECT * FROM $table_builder WHERE id = '$id'" );
             foreach ($qry as $row)
             {
@@ -1666,16 +1592,13 @@ function formed_admin_assets($hook)
             wp_enqueue_script('form-index-js', plugins_url( 'js/form-index.js', __FILE__ ),array(),$fc_version);
             wp_localize_script('form-index-js', 'MyAjax', array( 'ajaxurl' => admin_url( 'admin-ajax.php' ) ) );
 
-        }
-
-    }
+    
 }
 
 
 function formed_menu_inbox()
 {
-	$to_include='views/inbox.php';  
-    require($to_include); 
+	require_once 'views/inbox.php';
 }
 
 function formed_menu_options()
