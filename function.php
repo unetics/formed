@@ -2,7 +2,7 @@
 /* 
 Plugin Name:		Formed
 Description:		Premium WordPress form builder. Make amazing forms, incredibly fast.
-Version: 			1.1.3
+Version: 			1.1.4
 Text Domain:		formed
 GitHub Plugin URI:	unetics/formed
 GitHub Branch:		master
@@ -174,8 +174,8 @@ function formed_test_email()
     }
     $sender_name = $con[0]['mail_type']=='smtp' ? $con[0]['smtp_name'] : $con[0]['from_name'];
     $sender_email = $con[0]['mail_type']=='smtp' ? $con[0]['smtp_email'] : $con[0]['from_email'];
-    $email_subject = "Test Email from formed";
-    $email_body = "Hey<br>This is a test email from formed. If you have received it, it means your email settings are working fine.";
+    $email_subject = "Test email from Website Contact Form";
+    $email_body = "Hey<br>This is a test email from Formed, your WordPres website contact form builder. If you have received it, it means your email settings are working correctly.";
 
     /* SwiftMailer Test */
     error_reporting(0);
