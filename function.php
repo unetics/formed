@@ -2,7 +2,8 @@
 /* 
 Plugin Name:		Formed
 Description:		Premium WordPress form builder. Make amazing forms, incredibly fast.
-Version: 			1.1.4
+Version: 			1.2.0
+Author: 			Mitchell Bray
 Text Domain:		formed
 GitHub Plugin URI:	unetics/formed
 GitHub Branch:		master
@@ -46,30 +47,12 @@ Requires PHP:		5.3
     add_action('wp_ajax_formed_test_email', 'formed_test_email');
     add_action('wp_ajax_nopriv_formed_test_email', 'formed_test_email');
 
-function formed_parse_emails($string, $nos = 100)
+function formed_parse_emails($email, $nos = 100)
 {
-        $emails = array();
-        if(preg_match_all('/\s*"?([^><,"]+)"?\s*((?:<[^><,]+>)?)\s*/', $string, $matches, PREG_SET_ORDER) > 0)
-        {
-            $i = 0;
-            foreach($matches as $m)
-            {
-                if ($i>=$nos){break;}
-                if(! empty($m[2]))
-                {
-                    if (!filter_var(trim($m[2], '<>'), FILTER_VALIDATE_EMAIL)) {continue;}
-                    $emails[trim($m[2], '<>')] = trim($m[1]);
-                }
-                else
-                {
-                    if (!filter_var($m[1], FILTER_VALIDATE_EMAIL)) {continue;}
-                    $emails[$m[1]] = '';
-                }
-                $i++;
-            }
-        }
-        return $emails;
-    }
+	$email = trim($email,'"');
+	$email = explode(",", $email);
+	return $email;
+}
 
 function formed_replace_comments($startPoint, $endPoint, $newText, $source) 
 {
@@ -130,11 +113,6 @@ function formed_page()
                 {
                     $mess[$key] .= "<hr>$value[value]<hr>";
                 }
-                else if ($value['type'] == 'hidden' && $value['label']=='location') 
-                {
-                    $location = $value['value'];
-                    $location_url = $value['value'];
-                }
             }
 
             $name = $wpdb->get_results( "SELECT name FROM $table_builder WHERE id=".$row['form_id']." LIMIT 1", 'ARRAY_A' );
@@ -142,7 +120,7 @@ function formed_page()
             $mysub[$key]['name'] = $name;
 
             $message[$key] = 
-            '<div class="fcmodal-header"><h1>'.$name.'</h1><a class="location_url" target="_blank" href="'.$location_url.'">'.$location.'</a></div><ul class="fcmodal-body" style="padding: 25px">
+            '<div class="fcmodal-header"><h1>'.$name.'</h1></div><ul class="fcmodal-body" style="padding: 25px">
             '.$mess[$key].'
         </ul>';
 
@@ -174,59 +152,24 @@ function formed_test_email()
     }
     $sender_name = $con[0]['mail_type']=='smtp' ? $con[0]['smtp_name'] : $con[0]['from_name'];
     $sender_email = $con[0]['mail_type']=='smtp' ? $con[0]['smtp_email'] : $con[0]['from_email'];
-    $email_subject = "Test email from Website Contact Form";
-    $email_body = "Hey<br>This is a test email from Formed, your WordPres website contact form builder. If you have received it, it means your email settings are working correctly.";
+    $email_subject = "Test email from Website Contact Forms";
+    $email_body = "Hey<br>This is a test email from Formed, your WordPress website contact form builder. If you have received it, it means your email settings are working correctly.";
+    
+    
+    $multiple_recipients = $rec;
+    $subj = $email_subject;
+$body = $email_body.$rec;
+wp_mail( $multiple_recipients, $subj, $body );
+
 
     /* SwiftMailer Test */
     error_reporting(0);
     require_once('php/swift/lib/swift_required.php');
 
-    if ($con[0]['smtp_port']=='')
-    {
-        $con[0]['smtp_port'] = $con[0]['if_ssl']=='tls' ? 587 : 465;
-        $con[0]['smtp_port'] = $con[0]['if_ssl']=='false' || $con[0]['if_ssl']=='' ? 25 : $con[0]['smtp_port'];
-    }
-
-    if ($con[0]['mail_type']=='smtp')
-    {
-        if ($con[0]['if_ssl']=='ssl' || $con[0]['if_ssl']=='tls')
-        {
-            $transport = Swift_SmtpTransport::newInstance($con[0]['smtp_host'], $con[0]['smtp_port'], $con[0]['if_ssl'])
-            ->setUsername($con[0]['smtp_username'])
-            ->setPassword($con[0]['smtp_pass']);            
-        }
-        else
-        {
-            $transport = Swift_SmtpTransport::newInstance($con[0]['smtp_host'], $con[0]['smtp_port'])
-            ->setUsername($con[0]['smtp_username'])
-            ->setPassword($con[0]['smtp_pass']);            
-        }
-    }
-    else
-    {
-        $transport = Swift_MailTransport::newInstance();
-    }
-
-
     $sent = 0;
-    foreach($rec as $emailTo => $nameTo)
-    {
-        $mailer = Swift_Mailer::newInstance($transport);
-        $message = Swift_Message::newInstance()
-        ->setSubject($email_subject)
-        ->setFrom(array($sender_email => $sender_name))
-        ->setTo(array($emailTo => $nameTo))
-        ->setBody($email_body, 'text/html');
 
-        try
-        {
-            if ($mailer->send($message, $failures)) { $sent++; }
-        } catch (\Exception $e) {
-            echo $e->getMessage();
-        }
-    }
-
-    echo "Sent $sent email(s)";
+print_r($failures);
+    echo "Sent $numSent $sent email(s)";
     die();
 }
 
@@ -357,8 +300,6 @@ function formed_sub_upd()
             echo 'D';
         }
     }
-
-
     die();
 
 }
@@ -384,10 +325,12 @@ function formed_name_update()
 
 function formed_submit()
 {
-    error_reporting(0);
+
     global $errors, $id;
     $conten = file_get_contents('php://input');
+    parse_str($conten, $get_array);
     $conten = explode('&', $conten);
+    
     $nos = sizeof($conten);
     $title = $_POST['title'];
     $id = $_POST['id'];
@@ -415,6 +358,7 @@ function formed_submit()
             $new[$i]['custom5'] = $content_ex[11];
         }
         $i++;
+        
     }
 
     /* Get Form Options */
@@ -428,17 +372,13 @@ function formed_submit()
     }
 
     $con = json_decode($con, 1);
+    
     $rec = formed_parse_emails($rec);
 
-    if (isset($_POST['emails']))
-    {
+    if (isset($_POST['emails'])){
         $rec = array_merge($rec, formed_parse_emails($_POST['emails']));
     }
-
-
-	
-    /* Apply filter to recipients before sending so it can be handle externally  */
-    $rec = apply_filters('formed_presend_recipients', $rec, $id);
+    
 
     /* Run the Validation Functions */
     $i = 0;
@@ -446,68 +386,8 @@ function formed_submit()
     $ar_inc = 1;
     while ($i<$nos)
     {
-        if ($new[$i]['custom']=='autoreply')
-            {$autoreply[$ar_inc]=$new[$i]['value']; $ar_inc++;}
-        $new[$i]['custom3'] = 'zz'.$new[$i]['custom3'];
 
-        if ($new[$i]['type']=='email' && $new[$i]['custom4']=='notif')
-        {
-            $rec[$new[$i]['value']] = '';
-        }
-        if ($new[$i]['type']=='email' && $new[$i]['custom5']=='notif')
-        {
-            $rec[$new[$i]['value']] = '';
-        }
-        if ($new[$i]['label']=='files')
-        {
-            $filePath = dirname(__FILE__).'/file-upload/server/content/files/'.substr($new[$i]['value'], strrpos($new[$i]['value'], '/')+1);
-            if ((filesize($filePath)/1048576)<100)
-            {
-                $attachments[] = $filePath;
-            }
-        }
-
-
-        /* Prepare List for MailChimp */
-        if ($new[$i]['type']=='email' && (strpos($new[$i]['custom3'], 'm')==true) )
-            { $mc_add[]=$new[$i]['value'];}
-
-        /* Prepare List for AWeber */
-        if ($new[$i]['type']=='email' && (strpos($new[$i]['custom3'], 'a')==true) )
-            { $aw_add[]=$new[$i]['value'];}
-
-        /* Prepare List for Campaign Monitor */
-        if ($new[$i]['type']=='email' && (strpos($new[$i]['custom3'], 'c')==true) )
-            { $campaign_add[]=$new[$i]['value'];}
-
-        /* Prepare List for MyMail */
-        if ($new[$i]['type']=='email' && $new[$i]['custom4']=='true')
-        {
-            $mm_add[]=$new[$i]['value'];
-            $mm++;
-        }
-
-        /* Prepare List of Custom Variables for MC or MM */
-        if ( $new[$i]['type']!='email' && isset($new[$i]['custom']) )
-        {
-            if (!empty($new[$i]['value']))
-            {
-                $custom_var[$new[$i]['custom']] = $new[$i]['value'];            
-            }
-        }
-
-
-
-
-        if ($new[$i]['custom2']=='replyto')
-            {$replyto = $new[$i]['value'];}
-
-        if ($new[$i]['type']=='upload' && $new[$i]['value']=='0')
-            {$new[$i]['value']=null;}
-
-
-
-        formed_no_val($new[$i]['value'], $new[$i]['required'], $new[$i]['min'], $new[$i]['max'], $new[$i]['tooltip'], $con[0]);
+    formed_no_val($new[$i]['value'], $new[$i]['required'], $new[$i]['min'], $new[$i]['max'], $new[$i]['tooltip'], $con[0]);
 
 
         if (function_exists('formed_'.$new[$i]['validation']))
@@ -543,50 +423,11 @@ function formed_submit()
             $con = stripslashes($row['con']);
         }
         $con = json_decode($con, 1);
-
-
-
+        
         $sender_name = $con[0]['from_name'];
         $sender_email = $con[0]['from_email'];
 
         $success_sent = 0;
-
-        /* Add to MailChimp */
-        if (defined('formed_ADD'))
-        {
-
-            if ($con[0]['mc_double']=='true') {$con[0]['mc_double']=true;} else {$con[0]['mc_double']=false;}
-            if ($con[0]['mc_welcome']=='true') {$con[0]['mc_welcome']=true;} else {$con[0]['mc_welcome']=false;}
-
-            if ($con[0]['mc_list'] && isset($mc_add) && function_exists('mailchimp_fc'))
-            {
-                mailchimp_fc($mc_add, $custom_var, $con[0]['mc_list'], $con[0]['mc_double'], $con[0]['mc_welcome']);        
-            }
-
-            if ($con[0]['aw_list'] && isset($aw_add) && function_exists('aweber_fc'))
-            {
-                aweber_fc($aw_add, $custom_var, $con[0]['aw_list']);        
-            }
-
-            if ($con[0]['campaign_list'] && isset($campaign_add) && function_exists('campaign_fc'))
-            {
-                campaign_fc($campaign_add, $custom_var, $con[0]['campaign_list']);        
-            }
-
-        }
-
-
-        /* Add to MyMail */
-        if ( isset($con[0]['mm_list']) && defined('MYMAIL_VERSION'))
-        {
-            $template = 'notification.html';
-            foreach ($mm_add as $mm_email)
-            {
-                mymail_subscribe($mm_email,$custom_var,$con[0]['mm_list'],NULL,true,NULL,$template);
-            }
-        }
-
-
 
         /* Make the Email */
         $label_style = "padding: 4px 8px 4px 0px; margin: 0; width: 180px; font-size: 13px; font-weight: bold";
@@ -608,14 +449,9 @@ function formed_submit()
                 $new[$i]['value'] = $new[$i]['value'];                 
             }
 
-            if ( !(empty($new[$i]['type'])) && !($new[$i]['type']=='captcha') && !($new[$i]['type']=='hidden') && !($new[$i]['label']=='files') && !($new[$i]['label']=='divider') && !($new[$i]['type']=='radio') && !($new[$i]['type']=='check')  && !($new[$i]['type']=='smiley') && !($new[$i]['type']=='stars') && !($new[$i]['type']=='matrix') )
+            if ( !(empty($new[$i]['type'])) && !($new[$i]['type']=='captcha') && !($new[$i]['type']=='hidden') && !($new[$i]['label']=='divider') && !($new[$i]['type']=='radio') && !($new[$i]['type']=='check'))
             {
                 $email_body .= "<tr><td style='$label_style'> ".$new[$i]['label']."</td><td style='$value_style'>".htmlentities($new[$i]['value'])."</td></tr>";
-            }
-            else if ( $new[$i]['label']=='files' )
-            {
-                $email_body .= "<tr><td style='$label_style'>Attachment($att)</td><td style='$value_style'><a href='".$new[$i]['value']."'>".$new[$i]['value']."</a></td></tr>";
-                $att++;
             }
             else if ( $new[$i]['label']=='divider' )
             {
@@ -629,7 +465,7 @@ function formed_submit()
             {
                 $email_body .= "<tr><td style='$label_style'> ".$new[$i]['label']."</td><td style='$value_style'>".$new[$i]['value']."</td></tr>";
             }
-            else if (  $new[$i]['type']=='radio' || $new[$i]['type']=='check' || $new[$i]['type']=='smiley' || $new[$i]['type']=='stars' || $new[$i]['type']=='matrix' )
+            else if (  $new[$i]['type']=='radio' || $new[$i]['type']=='check' )
             {
                 if ( $new[$i]['value']==true )
                 {
@@ -657,21 +493,6 @@ function formed_submit()
         $subIDRow = $wpdb->get_results( "SELECT MAX(id) FROM $table_subs", ARRAY_A );
         $subID = intval($subIDRow[0]['MAX(id)'])+1;        
 
-        $pattern = '/\[.*?\]/';
-        preg_match_all($pattern, $con['0']['autoreply'], $matches);
-        foreach ($new as $field)
-        {
-            foreach ($matches[0] as $match)
-            {
-
-                $match2 = str_replace('[','',$match);
-                $match2 = str_replace(']','',$match2);
-                if ($field['label']==$match2)
-                {
-                    $con['0']['autoreply'] = str_replace($match, $field['value'], $con['0']['autoreply']);
-                }
-            }
-        }
 
         $pattern = '/\[.*?\]/';
         preg_match_all($pattern, $email_body, $matches);
@@ -688,36 +509,6 @@ function formed_submit()
                 }
             }
         }        
-
-        preg_match_all($pattern, $con['0']['autoreply_s'], $matches);
-        foreach ($new as $field)
-        {
-            foreach ($matches[0] as $match)
-            {
-
-                $match2 = str_replace('[','',$match);
-                $match2 = str_replace(']','',$match2);
-                if ($field['label']==$match2)
-                {
-                    $con['0']['autoreply_s'] = str_replace($match, $field['value'], $con['0']['autoreply_s']);
-                }
-            }
-        }
-
-        preg_match_all($pattern, $con[0]['email_sub'], $matches);
-        foreach ($new as $field)
-        {
-            foreach ($matches[0] as $match)
-            {
-
-                $match2 = str_replace('[','',$match);
-                $match2 = str_replace(']','',$match2);
-                if ($field['label']==$match2)
-                {
-                    $con[0]['email_sub'] = str_replace($match, $field['value'], $con[0]['email_sub']);
-                }
-            }
-        }
 
         $sender_name = $con[0]['mail_type']=='smtp' ? $con[0]['smtp_name'] : $con[0]['from_name'];
         $sender_email = $con[0]['mail_type']=='smtp' ? $con[0]['smtp_email'] : $con[0]['from_email'];
@@ -752,113 +543,10 @@ function formed_submit()
             }
         }
 
-        $sender_email = filter_var($sender_email, FILTER_VALIDATE_EMAIL) ? $sender_email : '';
-        $autoreply_email = filter_var($con[0]['autoreply_email'], FILTER_VALIDATE_EMAIL) ? $con[0]['autoreply_email'] : $sender_email;
-        $autoreply_name = $con[0]['autoreply_name'] ? $con[0]['autoreply_name'] : $sender_name;
-
-        $con[0]['email_sub'] = str_replace("[form_name]",$title,$con[0]['email_sub']);
-        $con[0]['autoreply_s'] = str_replace("[form_name]",$title,$con[0]['autoreply_s']);
-        $con[0]['autoreply'] = str_replace("[form_name]",$title,$con[0]['autoreply']);
-
-        $con[0]['email_sub'] = str_replace("[Form Name]",$title,$con[0]['email_sub']);
-        $con[0]['autoreply_s'] = str_replace("[Form Name]",$title,$con[0]['autoreply_s']);
-        $con[0]['autoreply'] = str_replace("[Form Name]",$title,$con[0]['autoreply']);
-
-        $con[0]['email_sub'] = str_replace("[ID]",$subID,$con[0]['email_sub']);
-        $con[0]['autoreply_s'] = str_replace("[ID]",$subID,$con[0]['autoreply_s']);
-        $con[0]['autoreply'] = str_replace("[ID]",$subID,$con[0]['autoreply']);
-
-        $con[0]['email_sub'] = str_replace("{{form_name}}",$title,$con[0]['email_sub']);
-        $con[0]['autoreply_s'] = str_replace("{{form_name}}",$title,$con[0]['autoreply_s']);
-        $con[0]['autoreply'] = str_replace("{{form_name}}",$title,$con[0]['autoreply']);
-
-        $email_subject = $con[0]['email_sub'];
-
-
-        /* SwiftMailer Test */
-        require_once('php/swift/lib/swift_required.php');
-
-        if ($con[0]['smtp_port']=='')
-        {
-            $con[0]['smtp_port'] = $con[0]['if_ssl']=='tls' ? 587 : 465;
-            $con[0]['smtp_port'] = $con[0]['if_ssl']=='false' || $con[0]['if_ssl']=='' ? 25 : $con[0]['smtp_port'];
-        }
-
-        if ($con[0]['mail_type']=='smtp')
-        {
-            if ($con[0]['if_ssl']=='ssl' || $con[0]['if_ssl']=='tls')
-            {
-                $transport = Swift_SmtpTransport::newInstance($con[0]['smtp_host'], $con[0]['smtp_port'], $con[0]['if_ssl'])
-                ->setUsername($con[0]['smtp_username'])
-                ->setPassword($con[0]['smtp_pass']);            
-            }
-            else
-            {
-                $transport = Swift_SmtpTransport::newInstance($con[0]['smtp_host'], $con[0]['smtp_port'])
-                ->setUsername($con[0]['smtp_username'])
-                ->setPassword($con[0]['smtp_pass']);            
-            }
-        }
-        else
-        {
-            $transport = Swift_MailTransport::newInstance();
-        }
-
-        if ($replyto==false) {$replyto = $sender_email;}
-
-        $sent = 0;
-        foreach($rec as $emailTo => $nameTo)
-        {
-            $mailer = Swift_Mailer::newInstance($transport);
-            $message = Swift_Message::newInstance()
-            ->setSubject($email_subject)
-            ->setFrom(array($sender_email => $sender_name))
-            ->setTo(array($emailTo => $nameTo))
-            ->setBody($email_body, 'text/html')
-            ;
-
-            if (filter_var($replyto, FILTER_VALIDATE_EMAIL))
-            {
-                $message->setReplyTo(array($replyto));
-            }
-            if ( isset($attachments) && count($attachments)>0 )
-            {
-                foreach ($attachments as $value)
-                {
-                    $message->attach(Swift_Attachment::fromPath($value));
-                }
-            }
-
-            try
-            {
-                if ($mailer->send($message, $failures)) { $sent++; }
-            } catch (\Exception $e) {
-                //echo $e->getMessage();
-            }
-        }
-
-        if ($autoreply)
-        {  
-            foreach ($autoreply as $user_email)
-            {
-                if (empty($user_email)) continue;
-                $mailer = Swift_Mailer::newInstance($transport);
-                $message = Swift_Message::newInstance()
-                ->setSubject($con['0']['autoreply_s'])
-                ->setFrom(array($autoreply_email => $autoreply_name))
-                ->setReplyTo(array($autoreply_email => $autoreply_name))
-                ->setTo(array($user_email))
-                ->setBody("<div style='white-space: pre-line'>".$con['0']['autoreply']."</div>", 'text/html')
-                ;
-                try
-                {
-                    $mailer->send($message, $failures);
-                } catch (\Exception $e) {
-                  //echo $e->getMessage();
-                }
-            }
-        }
-
+		$subj = $email_subject;
+		$body = $email_body;
+		$headers = array('Content-Type: text/html; charset=UTF-8');
+		wp_mail( $rec, $subj, $body, $headers );
 
 
         $new_json = json_encode($new);
@@ -1125,9 +813,7 @@ function formed_alpha($value, $valid, $req, $min, $max, $tool, $con)
 
 }
 
-function formed_update() 
-{
-
+function formed_update(){
 
     global $wpdb, $table_subs, $table_builder, $restricted;
 
@@ -1294,13 +980,9 @@ function formed_del()
     if ($wpdb->query( "DELETE FROM $table_builder WHERE id = '$id'" ))
     {
         if ($wpdb->query( "DELETE FROM $table_info WHERE id = '$id'" ))
-        {
-            echo "Deleted";
-        }
+        { echo "Deleted"; }
         else
-        {
-            echo "Deleted";
-        }
+        { echo "Deleted"; }
     }
 
     die();
@@ -1348,14 +1030,10 @@ function formed_activate()
 
 register_activation_hook( __FILE__, 'formed_activate' );
 
-function formeds_register_scripts()
-{
+function formeds_register_scripts(){
     global $fc_version;
-    wp_enqueue_script('formedjs', plugins_url( 'js/form.js?v=2', __FILE__ ), array('jquery','jquery-ui-core','jquery-ui-mouse', 'jquery-ui-widget', 'jquery-ui-sortable', 'jquery-ui-slider'),$fc_version);
+    wp_enqueue_script('formedjs', plugins_url( 'js/form.js?v=2', __FILE__ ), array('jquery'),$fc_version);
     wp_localize_script('formedjs', 'formedJS', array( 'ajaxurl' => admin_url( 'admin-ajax.php' ), 'server' => plugins_url('/formed/file-upload/server/content/upload.php'), 'locale' => plugins_url('/formed/libraries/datepicker/js/locales/'), 'other' => plugins_url('/formed') ) );
-    wp_enqueue_script('formedjs2', plugins_url( 'js/form_only.js', __FILE__ ),array(),$fc_version);
-    wp_enqueue_script('upload-1', plugins_url( 'libraries/upload/jquery.fileupload.min.js', __FILE__ ),array(),$fc_version);
-    wp_enqueue_script('upload-2', plugins_url( 'libraries/upload/jquery.iframe-transport.min.js', __FILE__ ),array(),$fc_version);
 }
 
 include('inc/widget.php');
@@ -1447,9 +1125,7 @@ function formed_menu()
     $alert_title = esc_attr( sprintf( '%d plugin warnings', $unread ) );
     $alert_count = '';
     $menu_label = sprintf( __( 'Inbox %s' ), "<span class='update-plugins count-$alert_count' title='$alert_title'><span class='update-count'>$unread</span></span>" );
-    add_submenu_page( 'formed_admin', 'Formed - Inboxs',  $menu_label, 'edit_posts', 'formed_admin_inbox', 'formed_menu_inbox' );
-  
-     
+    add_submenu_page( 'formed_admin', 'Formed - Inboxs',  $menu_label, 'edit_posts', 'formed_admin_inbox', 'formed_menu_inbox' );     
 }
 
 function url_get_contents ($Url) {
@@ -1464,8 +1140,7 @@ function url_get_contents ($Url) {
     return $output;
 }
 
-function noWhite($name)
-{ 
+function noWhite($name) { 
 	if( ini_get('allow_url_fopen') ) {   // lucky me my server allows file_get_contents ...
 		$file = file_get_contents(plugins_url('/formed/views/fields/'.$name.'.php'));
 	}else{
@@ -1476,8 +1151,7 @@ function noWhite($name)
 }
 
 add_action( 'admin_init', 'formed_admin_assets' ); 
-function formed_admin_assets($hook)
-{
+function formed_admin_assets($hook) {
     global $fc_version;
 
         /* Libraries and Extensions */
@@ -1498,7 +1172,11 @@ function formed_admin_assets($hook)
         /* Custom Work */
         wp_enqueue_style('fc-admin-style', plugins_url( 'css/admin-style.css', __FILE__ ),array(),$fc_version);  
         wp_enqueue_style('fc-common-style', plugins_url( 'css/common.css', __FILE__ ),array(),$fc_version);
- 
+		
+		if ( isset($_GET['id']) )
+        {
+
+
             global $wpdb, $table_builder;
             $id = addslashes($_GET["id"]);
             $qry = $wpdb->get_results( "SELECT * FROM $table_builder WHERE id = '$id'" );
@@ -1587,14 +1265,13 @@ function formed_admin_assets($hook)
 
             wp_enqueue_script( 'formed-build-js', plugins_url( 'js/build.js', __FILE__ ),array(),$fc_version);
             wp_localize_script( 'formed-build-js', 'MyAjax', array( 'ajaxurl' => admin_url( 'admin-ajax.php' ) ) );
-
+			}
             /* Our Own Stuff */
             wp_enqueue_script('form-index-js', plugins_url( 'js/form-index.js', __FILE__ ),array(),$fc_version);
             wp_localize_script('form-index-js', 'MyAjax', array( 'ajaxurl' => admin_url( 'admin-ajax.php' ) ) );
 
     
 }
-
 
 function formed_menu_inbox()
 {
